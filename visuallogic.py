@@ -1,6 +1,7 @@
 from gimpfu import *
 import re
 import os
+import sys
 
 def transform(x, y, img):  # transform ingame coordinates to picture coordinates
   factor = img.width / 4390.0
@@ -27,11 +28,13 @@ pickupDict = {
 }
 
 def run():
-  if not os.path.exists("C:/moon/areas.wotw"):
-    print("Could not find areas.wotw at C:/moon. Put it there please oriHug")
+  scriptdir = sys.path[-1]
+
+  if not os.path.exists(scriptdir + "/areas.wotw"):
+    print("Could not find areas.wotw at " + scriptdir + ". Please put it in the folder with the script oriHug")
     return
-  if not os.path.exists("C:/moon/loc_data.csv"):
-    print("Could not find loc_data at C:/moon. Put it there please oriHug")
+  if not os.path.exists(scriptdir + "/loc_data.csv"):
+    print("Could not find loc_data at " + scriptdir + ". Please put it in the folder with the script oriHug")
     return
   
   pdb.gimp_context_set_defaults()
@@ -49,7 +52,7 @@ def run():
   pdb.gimp_image_insert_layer(img, anchorconns, parent, 0)
   pdb.gimp_image_insert_layer(img, pickupconns, parent, 0)
   
-  logic = open("C:/moon/areas.wotw")
+  logic = open(scriptdir + "/areas.wotw")
   
   x = None
   for line in logic:
@@ -70,7 +73,7 @@ def run():
       if name in pickupDict:
         targetx, targety = pickupDict[name]  # See if this pickup has different map coordinates than loc_data coordinates
       else:
-        pickups = open("C:/moon/loc_data.csv")
+        pickups = open(scriptdir + "/loc_data.csv")
         for check in pickups:
           if name in check:
             targetx, targety = check.rsplit(", ")[-2:]  # set target location
@@ -87,7 +90,7 @@ def run():
     conn = re.search("conn .+:", line)
     if conn:
       name = conn.group()[5:-1]
-      areas = open("C:/moon/areas.wotw")
+      areas = open(scriptdir + "/areas.wotw")
       targetx = None
       for check in areas:
         if re.search("anchor %s at -?[0-9]+, -?[0-9]+" % (name), check):
